@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 bsub -J split < GoTChA_pipeline_submit_split.sh
 
