@@ -17,11 +17,6 @@
 #' @param max.distance Maximum number of mismatches allowed between barcodes and whitelist
 #' @return output Datatable with barcode and genotype calls
 
-out, barcodes.file.path, wt.max.mismatch = 0, mut.max.mismatch = 0,
-                            keep.raw.reads = FALSE, ncores = 1, reverse.complement = TRUE,
-                            testing = FALSE, which.read = "R1", primer.sequence = "CCTCATCATCCTCCTTGTC",
-                            primed.max.mismatch = 3, wt.sequence = "CGG", mut.sequence = "CAG",
-                            mutation.start = 31, mutation.end = 34, max.distance = 2
 
 # Helper functions
 read_and_process_fastq <- function(path, pattern, ncores) {
