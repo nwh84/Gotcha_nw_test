@@ -15,7 +15,8 @@
 #' @param mut.sequence Character vector of length one specifying the expected mutant sequence
 #' @param mutation.start Position in which the expected wild-type or mutant sequence starts in the read
 #' @param mutation.end Position in which the expected wild-type or mutant sequence ends in the read
-#' @param soptions List class object specifying the parameters for the jobs submitted to the slurm cluster
+#' @param job.hours
+#' @param job.memory
 #' @return Archr Project with added genotyping columns into the metadata
 #'
 #'
@@ -36,7 +37,7 @@ BatchMutationCalling = function(out = "/path_to_filtered_fastqs/",
                                 mut.sequence = "CAG",
                                 mutation.start = 31,
                                 mutation.end = 34,
-                                soptions = list(mem = '20g', 'cpus-per-task' = 10)
+                                max.distance = 2
 ){
 
   options(expressions = 2.5e5) # Increase the number of nested expressions to be evaluated. Limit is 5e5.
@@ -65,17 +66,25 @@ BatchMutationCalling = function(out = "/path_to_filtered_fastqs/",
               wt.sequence =  wt.sequence,
               mut.sequence = mut.sequence,
               mutation.start = mutation.start,
-              mutation.end = mutation.end)
+              mutation.end = mutation.end,
+              max.distance = max.distance)
 
   pars = as.data.frame(pars,stringsAsFactors = F)
 
   setwd(out)
 
-  message("------- SUBMITTING SLURM JOBS TO CLUSTER -------")
-  sjobs <- lapply(chunk.index, function(x){
-    pars$out = paste0(out,x,"/")
-    slurm_apply(f = MutationCalling, params = pars, jobname = x, nodes = 1, cpus_per_node = 1, slurm_options = soptions, submit = T)
-  })
+  message("------- CALLING MUTATIONS -------")
 
-  message("------- ALL JOBS SUBMITTED! -------")
+  mclapply(chunk.index, function(x){
+    pars$out = paste0(out,x,"/")
+    # run each chunk with only one core
+    pars$ncores = 1
+    parameters <- as.list(pars[1,])
+    mutation_calling <- do.call(MutationCalling, parameters)
+    saveRDS(object = mutation_calling, file = paste0(out,"mutation_call_", x))
+  }, mc.cores = ncores)
+
+  message("------- FINISHED MUTATION CALLING! -------")
 }
+
+
