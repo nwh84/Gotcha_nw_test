@@ -13,6 +13,8 @@ library(stringdist)
 library(ShortRead)
 library(Biostrings)
 library(graphics)
+library(RANN)
+library(data.table)
 
 source("/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_nw_test/R/AddGenotypingArchr.R")
 source("/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_nw_test/R/BatchMutationCalling.R")
