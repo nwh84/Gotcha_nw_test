@@ -1,0 +1,60 @@
+Sender: LSF System <lsfadmin@lc07e69>
+Subject: Job 161828764: <split> in cluster <chimera> Done
+
+Job <split> was submitted from host <lh06c31> by user <wheeln02> in cluster <chimera> at Thu Dec 19 17:16:52 2024
+Job was executed on host(s) <12*lc07e69>, in queue <premium>, as user <wheeln02> in cluster <chimera> at Thu Dec 19 17:20:23 2024
+</hpc/users/wheeln02> was used as the home directory.
+</sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_nw_test> was used as the working directory.
+Started at Thu Dec 19 17:20:23 2024
+Terminated at Thu Dec 19 17:32:32 2024
+Results reported at Thu Dec 19 17:32:32 2024
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#BSUB -J gotcha_split
+#BSUB -P acc_MDS 
+#BSUB -q premium
+#BSUB -n 12
+#BSUB -W 2:00
+#BSUB -R rusage[mem=15GB]
+#BSUB -R span[hosts=1] 
+#BSUB -oo %J.stdout
+#BSUB -eo %J.stderr
+#BSUB -R "select[osmajor!=CENT7]"
+#BSUB -L /bin/bash
+
+
+module load R/4.2.0
+module load nlopt
+
+Rscript GoTChA_test_full_FastqSplit.R
+
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   2140.02 sec.
+    Max Memory :                                 664 MB
+    Average Memory :                             638.89 MB
+    Total Requested Memory :                     184320.00 MB
+    Delta Memory :                               183656.00 MB
+    Max Swap :                                   -
+    Max Processes :                              28
+    Max Threads :                                30
+    Run time :                                   729 sec.
+    Turnaround time :                            940 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file <161828764.stderr> for stderr output of this job.
+

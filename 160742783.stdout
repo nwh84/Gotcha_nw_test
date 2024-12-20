@@ -1,0 +1,89 @@
+Sender: LSF System <lsfadmin@lh06c23>
+Subject: Job 160742783: <gotcha_data> in cluster <chimera> Done
+
+Job <gotcha_data> was submitted from host <lh06c31> by user <wheeln02> in cluster <chimera> at Tue Dec 17 16:05:23 2024
+Job was executed on host(s) <lh06c23>, in queue <premium>, as user <wheeln02> in cluster <chimera> at Tue Dec 17 16:05:26 2024
+</hpc/users/wheeln02> was used as the home directory.
+</sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_nw_test> was used as the working directory.
+Started at Tue Dec 17 16:05:26 2024
+Terminated at Tue Dec 17 20:14:11 2024
+Results reported at Tue Dec 17 20:14:11 2024
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#BSUB -J gotcha_data
+#BSUB -P acc_MDS 
+#BSUB -q premium
+#BSUB -n 1
+#BSUB -W 24:00
+#BSUB -R rusage[mem=50GB]
+#BSUB -R span[hosts=1] 
+#BSUB -oo %J.stdout
+#BSUB -eo %J.stderr
+#BSUB -R "select[osmajor!=CENT7]"
+#BSUB -L /bin/bash
+
+
+module load R/4.2.0
+module load nlopt
+
+#Rscript GoTChA_test_full_MutCall.R
+Rscript test_mut_calling.R
+#Rscript test_mut_calling_approx.R
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   14851.01 sec.
+    Max Memory :                                 2098 MB
+    Average Memory :                             1956.24 MB
+    Total Requested Memory :                     51200.00 MB
+    Delta Memory :                               49102.00 MB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                52
+    Run time :                                   14925 sec.
+    Turnaround time :                            14928 sec.
+
+The output (if any) follows:
+
+[1] "start time:"
+[1] "2024-12-17 16:05:41 EST"
+[1] "before barcode match"
+[1] "2024-12-17 16:06:04 EST"
+[1] "barcodes left"
+[1] 1991292
+[1] "after perfect match"
+[1] "2024-12-17 16:06:07 EST"
+[1] "barcodes left:"
+[1] 572257
+[1] "finished rann"
+[1] "2024-12-17 16:39:09 EST"
+[1] "finished hamming"
+[1] "2024-12-17 16:40:02 EST"
+[1] "barcodes left:"
+[1] 559535
+[1] "finished rann2"
+[1] "2024-12-17 17:07:13 EST"
+[1] "finished hamming2"
+[1] "2024-12-17 17:07:55 EST"
+[1] "barcodes left:"
+[1] 551509
+[1] "finished hamming on everything left over"
+[1] "2024-12-17 20:13:52 EST"
+[1] "barcodes left:"
+[1] 16402
+[1] "finished time:"
+[1] "2024-12-17 20:14:04 EST"
+
+
+PS:
+
+Read file <160742783.stderr> for stderr output of this job.
+

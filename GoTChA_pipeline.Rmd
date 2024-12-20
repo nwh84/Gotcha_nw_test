@@ -19,24 +19,11 @@ library(rslurm)
 ### Then, we can define the paths and inputs for the pipeline
 
 ```{r}
-path_to_fastqs = "/gpfs/commons/home/tbotella/GOTCHA/MPN15_16_CMP53/MPN15/gotcha_fastqs"
-path_out = "/gpfs/commons/home/tbotella/GOTCHA/MPN15_16_CMP53/MPN15/gotcha_fastqs/outs"
+path_to_fastqs = "/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_test_pipeline/GoTChA_test_data/gotcha_test_data_subset2"
+path_out = "/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_test_pipeline/out_data/"
 
 barcodes.file.path = "/gpfs/commons/home/tbotella/GOTCHA/MPN15_16_CMP53/MPN15/MPN15_new_ATAC/outs/singlecell.csv"
 
-which.read = "R3"
-
-read.region = c(34:37)
-mutation.start = 34
-mutation.end = 37
-
-primer.sequence = "AAAGCCTGTAGTTTTACTTACTCTCGTCTCCACA"
-
-wt.sequence = "GAC" 
-mut.sequence= "GAA"
-
-sample_id = "MPN15"
-gene_id = "JAK2"
 ```
 
 
@@ -46,39 +33,35 @@ gene_id = "JAK2"
 ```{r}
 # Split the fastq files in chunks to allow for parallel processing and filter out reads that contain low quality scores,
 # particularly at the mutation site of interest
-FastqFiltering(
-   path = path_to_fastqs,
-   out = path_out,
-   reads = 250000,
-   min.quality = 15,
-   min.bases = 1,
-   which.read = which.read,
-   read.region = read.region,
-   ncores = 19
-   )
- 
 
-if (which.read == "R3") {
-	which.read = "R2"
-	print('--Changed which.read to "R2"--')
+
+FastqFiltering(path = path_to_fastqs, 
+               out = path_out, 
+               min.quality = 15, 
+               min.bases =1, 
+               which.read= "R1", 
+               read.region = c(1:50), 
+               ncores=20)
+
+bsub_opt$temp_dir <- "/sc/arion/projects/MDS/gotcha_pipeline_nwheeler/Gotcha_test_pipeline/bsub_test_dir"
+
+bsub_opt$bsub_template = function(name, hours, memory, cores, ...) {
+    glue::glue("bsub -J '{name}' -W '{hours}:00' -n {cores} -R 'rusage[mem={memory}GB]' -P 'project_name'")
 }
 
 # Run Gotcha with parallel computing in slurm: submit one cluster job per fastq chunk
-BatchMutationCalling(out  = path_out,
-                     barcodes.file.path = barcodes.file.path,
-                     wt.max.mismatch = 0, 
-                     mut.max.mismatch = 0, 
-                     keep.raw.reads = F, 
-                     reverse.complement = T, 
-                     testing = F,
-                     which.read = which.read, 
-                     primer.sequence = primer.sequence, 
-                     primed.max.mismatch = 3, 
-                     wt.sequence = wt.sequence, 
-                     mut.sequence = mut.sequence,
-                     mutation.start = mutation.start,
-                     mutation.end = mutation.end,
-                     soptions = list(output=paste0('GoT_','%x_%j.log'),mem = '10g', 'cpus-per-task' = 5) 
+BatchMutationCalling(out  = "/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_test_pipeline/GoTChA_test_data/gotcha_test_data_subset2/",
+                     which.read = "R1",
+                     mutation.start = 1, # take the whole read
+                     mutation.end = 50, 
+                     barcodes.file.path = "/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_test_pipeline/GoTChA_test_data/gotcha_test_data_subset/CBNN_0_singlecell.csv",
+                     primer.sequence = "A", # this checks the match for the intial nucleotides
+                     primed.max.mismatch = 1, # putting 1 here allows one nucleotide mismatch a thus primer matching should not eliminate any reads as we only put 1 nucleotide anyway
+                     wt.sequence = "GCATGTATGCAATGCCTTGGTAGGAATGGGACAGGTGTAGGATGGAAAAT", 
+                     mut.sequence= "AAGGCGTTTCTTCTCTGACCGCACAACTGGGGCCTGGGGGGCTCCAAAGC",
+                     wt.max.mismatch = 0, # set up on perfect matching for increased accuracy
+                     mut.max.mismatch = 0,
+                     ncores = 10
 )
 
 ```
