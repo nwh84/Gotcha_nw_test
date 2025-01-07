@@ -80,8 +80,10 @@ BatchMutationCalling = function(out = "/path_to_filtered_fastqs/",
     # run each chunk with only one core
     pars$ncores = 1
     parameters <- as.list(pars[1,])
-    mutation_calling <- do.call(MutationCalling, parameters)
-    saveRDS(object = mutation_calling, file = paste0(out,"mutation_call_", x))
+    if (!file.exists(paste0(out,"mutation_call_", x))){
+      mutation_calling <- do.call(MutationCalling, parameters)
+      saveRDS(object = mutation_calling, file = paste0(out,"mutation_call_", x))
+    }
   }, mc.cores = ncores)
 
   message("------- FINISHED MUTATION CALLING! -------")

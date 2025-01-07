@@ -24,7 +24,9 @@ MergeMutationCalling = function(out){
   message("------- COLLAPSE BARCODE METRICS -------")
   message("------- Number of matched barcodes = ", nrow(outs.collapse))
 
-  system(paste0('mkdir ',out,'MergedOuts'))
+  if (!file.exists(paste0(out,'MergedOuts'))){
+    system(paste0('mkdir ',out,'MergedOuts'))
+  }
   saveRDS(outs.collapse, file = paste0(out,'MergedOuts/outs.collapsed.Rdata'))
   message("------- OUTPUT SAVED -------")
 }
