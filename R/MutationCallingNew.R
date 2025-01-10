@@ -37,10 +37,7 @@ subset_for_testing <- function(fastq_data, max_reads = 1000, ncores) {
 }
 
 convert_to_numeric_matrix <- function(input) {
-  # Convert each character in the barcode to its ASCII value
-  #as.data.table(do.call(rbind, lapply(input, function(bc) {
-  #  as.integer(charToRaw(bc))
-  #})))
+  # Convert each character in the barcode to a numeric value
   char_to_num <- c(A = 1, C = 2, G = 3, T = 4)
   numeric_matrix <- t(sapply(input, function(x) {
          char_to_num[unlist(strsplit(x, ""))]
@@ -150,6 +147,7 @@ MutationCalling <- function(out, barcodes.file.path, wt.max.mismatch = 0, mut.ma
   # reverse complement and convert to dnastringset
   if (reverse.complement) {
     barcodes <- lapply(barcodes, function(x) reverseComplement(DNAStringSet(x)))
+    message(paste0("------- ", chunk_name ," CELL BARCODES HAVE BEEN REVERSE COMPLEMENTED -------"))
   }
   message(paste0("------- STARTING BARCODE MATCHING ", chunk_name ," -------"))
   # check which barcodes are perfect match
@@ -207,7 +205,7 @@ MutationCalling <- function(out, barcodes.file.path, wt.max.mismatch = 0, mut.ma
   message("total number of ", chunk_name ," starting barcodes = ", length(matched_barcodes))
   end_bc <- length(which(matched_barcodes != "No match" & matched_barcodes != "Too many matches"))
   message(paste0("total number of ", chunk_name, " matched barcodes = ", end_bc))
-  message("% ", chunk_name, " barcode matching = ", round((length(matched_barcodes)/end_bc)*100,2))
+  message("% ", chunk_name, " barcode matching = ", round((end_bc/length(matched_barcodes))*100,2))
   message(paste0("------- STARTING PER READ GENOTYPING ", chunk_name ," -------"))
   # Genotype reads
   genotyped_reads <- genotype_reads(reads, wt.sequence, mut.sequence, mutation.start, mutation.end, wt.max.mismatch, mut.max.mismatch, ncores)
