@@ -30,14 +30,13 @@ BatchMutationCalling = function(out = "/path_to_filtered_fastqs/",
                                 reverse.complement = T,
                                 testing = F,
                                 which.read = "R1",
-                                primer.sequence = "CCTCATCATCCTCCTTGTC",
-                                primed.max.mismatch = 3,
                                 barcodes.file.path = "/path_to_singlecell.csv",
                                 wt.sequence =  "CGG",
                                 mut.sequence = "CAG",
                                 mutation.start = 31,
                                 mutation.end = 34,
-                                max.distance = 2
+                                max.distance = 2,
+                                rewrite = TRUE
 ){
 
   options(expressions = 2.5e5) # Increase the number of nested expressions to be evaluated. Limit is 5e5.
@@ -51,17 +50,17 @@ BatchMutationCalling = function(out = "/path_to_filtered_fastqs/",
     lapply(strsplit(x,"_"), function(y) y[length(y)])
   })))
 
+  # only select the chunk.indexes from the directory
+  chunk.index = chunk.index[grepl("^[a-z]{2}$", chunk.index)]
+
   message("------- GENERATING PARAMETERS -------")
   pars = list(out = out,
               wt.max.mismatch = wt.max.mismatch,
               mut.max.mismatch = mut.max.mismatch,
-              keep.raw.reads = keep.raw.reads,
               ncores = ncores,
               reverse.complement = reverse.complement,
               testing = testing,
               which.read = which.read,
-              primer.sequence = primer.sequence,
-              primed.max.mismatch = primed.max.mismatch,
               barcodes.file.path = barcodes.file.path,
               wt.sequence =  wt.sequence,
               mut.sequence = mut.sequence,
@@ -80,10 +79,17 @@ BatchMutationCalling = function(out = "/path_to_filtered_fastqs/",
     # run each chunk with only one core
     pars$ncores = 1
     parameters <- as.list(pars[1,])
-    if (!file.exists(paste0(out,"mutation_call_", x))){
-      mutation_calling <- do.call(MutationCalling, parameters)
-      saveRDS(object = mutation_calling, file = paste0(out,"mutation_call_", x))
-    }
+    tryCatch({
+      if (!file.exists(paste0(out, "mutation_call_", x, ".rds")) & rewrite == FALSE) {
+        mutation_calling <- do.call(MutationCalling, parameters)
+        saveRDS(object = mutation_calling, file = paste0(out, "mutation_call_", x, ".rds"))
+      } else if (rewrite == TRUE) {
+        mutation_calling <- do.call(MutationCalling, parameters)
+        saveRDS(object = mutation_calling, file = paste0(out, "mutation_call_", x, ".rds"))
+      }
+    }, error = function(e) {
+      message("ERROR IN CHUNK ", x, "!!!: ", conditionMessage(e), "\n")
+    })
   }, mc.cores = ncores)
 
   message("------- FINISHED MUTATION CALLING! -------")

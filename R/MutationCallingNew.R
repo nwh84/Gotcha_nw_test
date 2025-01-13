@@ -125,9 +125,9 @@ genotype_reads <- function(reads, wt_seq, mut_seq, mutation_start, mutation_end,
 
 # Main function
 MutationCalling <- function(out, barcodes.file.path, wt.max.mismatch = 0, mut.max.mismatch = 0,
-                            keep.raw.reads = FALSE, ncores = 1, reverse.complement = TRUE,
-                            testing = FALSE, which.read = "R1", primer.sequence = "CCTCATCATCCTCCTTGTC",
-                            primed.max.mismatch = 3, wt.sequence = "CGG", mut.sequence = "CAG",
+                            ncores = 1, reverse.complement = TRUE,
+                            testing = FALSE, which.read = "R1",
+                            wt.sequence = "CGG", mut.sequence = "CAG",
                             mutation.start = 31, mutation.end = 34, max.distance = 2) {
   # get chunk name
   chunk_name <- basename(out)
@@ -139,7 +139,7 @@ MutationCalling <- function(out, barcodes.file.path, wt.max.mismatch = 0, mut.ma
   #message("Whitelist loaded with ", length(whitelist), " unique barcodes.")
   # Load FASTQ files
   fastq_data <- read_and_process_fastq(out, pattern = ".fastq.gz", ncores = ncores)
-  if (testing) fastq_data <- subset_for_testing(fastq_data, max_reads = 10000, ncores = ncores)
+  if (testing) fastq_data <- subset_for_testing(fastq_data, max_reads = 1000, ncores = ncores)
   message(paste0("------- FASTQ FILES LOADED ", chunk_name ," -------"))
   # Process sequences
   barcodes <- fastq_data[[grep(names(fastq_data), pattern = "_R2_")]]
@@ -213,7 +213,6 @@ MutationCalling <- function(out, barcodes.file.path, wt.max.mismatch = 0, mut.ma
   message(paste0("------- SAVING OUTPUT ", chunk_name ," ... -------"))
   # Output processing
   output <- list(matched_barcodes = matched_barcodes, genotyped_reads = genotyped_reads)
-  if (keep.raw.reads) output$raw_reads <- reads
 
   message(paste0("------- ", chunk_name ," CHUNK DONE! -------"))
   return(output)

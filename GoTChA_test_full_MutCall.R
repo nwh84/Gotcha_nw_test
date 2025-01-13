@@ -25,7 +25,7 @@ source("/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_nw_test/R/
 source("/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_nw_test/R/MergeFastqs.R")
 source("/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_nw_test/R/MergeMutationCalling.R")
 source("/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_nw_test/R/MutationCallingNew.R")
-source("/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_nw_test/R/FastqFilteringNew.R")
+source("/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_nw_test/R/FastqFiltering.R")
 
 start.time <- Sys.time()
 
@@ -42,7 +42,10 @@ BatchMutationCalling(out  = path,
                      mut.sequence= "AAGGCGTTTCTTCTCTGACCGCACAACTGGGGCCTGGGGGGCTCCAAAGC",
                      wt.max.mismatch = 0, # set up on perfect matching for increased accuracy
                      mut.max.mismatch = 0,
-                     ncores = 44
+                     ncores = 44,
+                     rewrite = TRUE,
+                     testing = FALSE,
+                     max.distance = 2
 )
 
 
