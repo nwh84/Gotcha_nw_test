@@ -8,6 +8,7 @@ FastqFiltering = function(out = "/path_to_fastqs/",
   message("------- BEGIN FASTQ FILTERING FUNCTION -------")
 
   out = paste0(out,"Split/")
+  if (!dir.exists(out)) {message("ERROR: DIRECTORY ",out ," DOES NOT EXIST")}
 
   # get fastq file names
   fastq.files = as.list(dir(path = out, pattern = ".fastq.gz"))

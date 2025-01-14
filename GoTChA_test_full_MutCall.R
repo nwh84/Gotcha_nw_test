@@ -29,23 +29,23 @@ source("/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_nw_test/R/
 
 start.time <- Sys.time()
 
-path <- "/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_test_pipeline/GoTChA_test_data/"
+#path <- "/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_test_pipeline/GoTChA_test_data/"
+
+path <- "/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_test_pipeline/GoTChA_test_data/gotcha_test_data_subset2/"
 
 BatchMutationCalling(out  = path,
                      which.read = "R1",
                      mutation.start = 1, # take the whole read
                      mutation.end = 50,
                      barcodes.file.path = "/sc/arion/projects/MDS/noelle/gotcha_pipeline_nwheeler/Gotcha_test_pipeline/GoTChA_test_data/gotcha_test_data_subset/CBNN_0_singlecell.csv",
-                     primer.sequence = "A", # this checks the match for the intial nucleotides
-                     primed.max.mismatch = 1, # putting 1 here allows one nucleotide mismatch a thus primer matching should not eliminate any reads as we only put 1 nucleotide anyway
                      wt.sequence = "GCATGTATGCAATGCCTTGGTAGGAATGGGACAGGTGTAGGATGGAAAAT",
                      mut.sequence= "AAGGCGTTTCTTCTCTGACCGCACAACTGGGGCCTGGGGGGCTCCAAAGC",
                      wt.max.mismatch = 0, # set up on perfect matching for increased accuracy
                      mut.max.mismatch = 0,
                      ncores = 44,
-                     rewrite = TRUE,
-                     testing = FALSE,
-                     max.distance = 2
+                     rewrite = FALSE,
+                     testing = TRUE,
+                     max.distance = 3
 )
 
 

@@ -125,31 +125,32 @@ genotype_reads <- function(reads, wt_seq, mut_seq, mutation_start, mutation_end,
 
 # Main function
 MutationCalling <- function(out, barcodes.file.path, wt.max.mismatch = 0, mut.max.mismatch = 0,
-                            ncores = 1, reverse.complement = TRUE,
-                            testing = FALSE, which.read = "R1",
-                            wt.sequence = "CGG", mut.sequence = "CAG",
-                            mutation.start = 31, mutation.end = 34, max.distance = 2) {
+                            ncores = 1, reverse.complement = TRUE, testing = FALSE, which.read = "R1",
+                            wt.sequence = "CGG", mut.sequence = "CAG", mutation.start = 31, 
+                            mutation.end = 34, max.distance = 2) {
+                        
+  # make output file 
+  out_file <- paste0(out, "out.log")
   # get chunk name
   chunk_name <- basename(out)
-  message(paste0("------- BEGIN MUTATION CALLING ", chunk_name ," -------"))
+  cat(paste0("------- BEGIN MUTATION CALLING ", chunk_name ," -------"), file=out_file,sep="\n")
   # Load whitelist from the specified file path
   whitelist <- load_whitelist(barcodes.file.path)
   # remove "NO_BARCODE" from whitelist
   whitelist <- whitelist[whitelist != "NO_BARCODE"]
-  #message("Whitelist loaded with ", length(whitelist), " unique barcodes.")
   # Load FASTQ files
   fastq_data <- read_and_process_fastq(out, pattern = ".fastq.gz", ncores = ncores)
   if (testing) fastq_data <- subset_for_testing(fastq_data, max_reads = 1000, ncores = ncores)
-  message(paste0("------- FASTQ FILES LOADED ", chunk_name ," -------"))
+  cat(paste0("------- FASTQ FILES LOADED ", chunk_name ," -------"), file=out_file, sep = "\n", append=TRUE)
   # Process sequences
   barcodes <- fastq_data[[grep(names(fastq_data), pattern = "_R2_")]]
   reads <- fastq_data[[grep(names(fastq_data), pattern = paste0("_", which.read, "_"))]]
   # reverse complement and convert to dnastringset
   if (reverse.complement) {
     barcodes <- lapply(barcodes, function(x) reverseComplement(DNAStringSet(x)))
-    message(paste0("------- ", chunk_name ," CELL BARCODES HAVE BEEN REVERSE COMPLEMENTED -------"))
+    cat(paste0("------- ", chunk_name ," CELL BARCODES HAVE BEEN REVERSE COMPLEMENTED -------"), file=out_file, sep = "\n", append=TRUE)
   }
-  message(paste0("------- STARTING BARCODE MATCHING ", chunk_name ," -------"))
+  cat(paste0("------- STARTING BARCODE MATCHING ", chunk_name ," -------"), file=out_file, sep = "\n", append=TRUE)
   # check which barcodes are perfect match
   matched_barcodes_ind <- (as.character(barcodes$x) %in% whitelist)
   matched_barcodes <- rep(NA, length(matched_barcodes_ind))
@@ -201,19 +202,21 @@ MutationCalling <- function(out, barcodes.file.path, wt.max.mismatch = 0, mut.ma
   non_match_barcodes_filt[-final_ind_remove] <- out
   # combine back with original
   matched_barcodes[!matched_barcodes_ind] <- non_match_barcodes_filt
-  message(paste0("------- BARCODE MATCHING COMPLETED ", chunk_name ," -------"))
-  message("total number of ", chunk_name ," starting barcodes = ", length(matched_barcodes))
+  sink(out_file)
+  cat(paste0("------- BARCODE MATCHING COMPLETED ", chunk_name ," -------"), sep = "\n", append=TRUE)
+  cat(paste0("total number of ", chunk_name ," starting barcodes = ", length(matched_barcodes)), sep = "\n", append=TRUE)
   end_bc <- length(which(matched_barcodes != "No match" & matched_barcodes != "Too many matches"))
-  message(paste0("total number of ", chunk_name, " matched barcodes = ", end_bc))
-  message("% ", chunk_name, " barcode matching = ", round((end_bc/length(matched_barcodes))*100,2))
-  message(paste0("------- STARTING PER READ GENOTYPING ", chunk_name ," -------"))
+  cat(paste0("total number of ", chunk_name, " matched barcodes = ", end_bc), sep = "\n", append=TRUE)
+  cat(paste0("% ", chunk_name, " barcode matching = ", round((end_bc/length(matched_barcodes))*100,2)), sep = "\n", append=TRUE)
+  cat(paste0("------- STARTING PER READ GENOTYPING ", chunk_name ," -------"), sep = "\n", append=TRUE)
+  sink()
   # Genotype reads
   genotyped_reads <- genotype_reads(reads, wt.sequence, mut.sequence, mutation.start, mutation.end, wt.max.mismatch, mut.max.mismatch, ncores)
-  message(paste0("------- GENOTYPING COMPLETED ", chunk_name ," -------"))
-  message(paste0("------- SAVING OUTPUT ", chunk_name ," ... -------"))
+  cat(paste0("------- GENOTYPING COMPLETED ", chunk_name ," -------"), file = out_file, sep = "\n", append=TRUE)
+  cat(paste0("------- SAVING OUTPUT ", chunk_name ," ... -------"), file = out_file, sep = "\n", append=TRUE)
   # Output processing
   output <- list(matched_barcodes = matched_barcodes, genotyped_reads = genotyped_reads)
-
-  message(paste0("------- ", chunk_name ," CHUNK DONE! -------"))
+  
+  cat(paste0("------- ", chunk_name ," CHUNK DONE! -------"), file = out_file, sep = "\n", append=TRUE)
   return(output)
 }

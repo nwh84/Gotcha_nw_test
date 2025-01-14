@@ -38,6 +38,8 @@ BatchMutationCalling = function(out = "/path_to_filtered_fastqs/",
                                 max.distance = 2,
                                 rewrite = TRUE
 ){
+  if (max.distance > 2){ message("WARNING: MAX DISTANCE ", max.distance, " ALLOWS MANY MISMATCHES!")}
+  if (testing == TRUE){ message("------- READS WILL BE SUBSETTED FOR TESTING -------")}
 
   options(expressions = 2.5e5) # Increase the number of nested expressions to be evaluated. Limit is 5e5.
 
@@ -70,6 +72,7 @@ BatchMutationCalling = function(out = "/path_to_filtered_fastqs/",
 
   pars = as.data.frame(pars,stringsAsFactors = F)
 
+  if (!dir.exists(out)) {message("ERROR: DIRECTORY ",out ," DOES NOT EXIST")}
   setwd(out)
 
   message("------- CALLING MUTATIONS -------")
@@ -86,6 +89,8 @@ BatchMutationCalling = function(out = "/path_to_filtered_fastqs/",
       } else if (rewrite == TRUE) {
         mutation_calling <- do.call(MutationCalling, parameters)
         saveRDS(object = mutation_calling, file = paste0(out, "mutation_call_", x, ".rds"))
+      } else {
+        message("CHUNK ", x, " WILL NOT BE REWRITTEN. SKIPPING...")
       }
     }, error = function(e) {
       message("ERROR IN CHUNK ", x, "!!!: ", conditionMessage(e), "\n")
