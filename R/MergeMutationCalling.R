@@ -21,11 +21,17 @@ MergeMutationCalling = function(out){
                                                                   MUTcount = sum(as.numeric(MUTcount)))
   outs.collapse$MUTfraction = (outs.collapse$MUTcount / (outs.collapse$MUTcount + outs.collapse$WTcount))
 
+  # remove "Too many match" and "No match" barcodes
+  outs.collapse <- outs.collapse[-which(outs.collapse$matched_barcodes == "Too many matches"),]
+  outs.collapse <- outs.collapse[-which(outs.collapse$matched_barcodes == "No match"),]
+
   message("------- COLLAPSE BARCODE METRICS -------")
   message("------- Number of matched barcodes = ", nrow(outs.collapse))
 
   if (!file.exists(paste0(out,'MergedOuts'))){
     system(paste0('mkdir ',out,'MergedOuts'))
+  } else{
+    message("WARNING: 'MergedOuts' FOLDER EXISTS AND WILL BE REWRITTEN")
   }
   saveRDS(outs.collapse, file = paste0(out,'MergedOuts/outs.collapsed.Rdata'))
   message("------- OUTPUT SAVED -------")
