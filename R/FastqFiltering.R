@@ -68,7 +68,7 @@ FastqFiltering = function(out = "/path_to_fastqs/",
   mclapply(unique(chunk.index), function(x) {
     selected = grep(names(filter.files), pattern = paste0("_", x,"_"), value = T)
     lapply(selected, function(y){
-      writeFastq(object = filter.files[[y]], file = paste0(out,"Filtered/",x,"/filtered_bq",min.quality,"_bn",min.bases,"_",y), mode = "a")
+      writeFastq(object = filter.files[[y]], file = paste0(out,"Filtered/",x,"/filtered_bq",min.quality,"_bn",min.bases,"_",y))
     })
   }, mc.cores = ncores)
 
