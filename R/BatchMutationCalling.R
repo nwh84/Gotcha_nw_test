@@ -40,6 +40,7 @@ BatchMutationCalling = function(out = "/path_to_filtered_fastqs/",
 ){
   if (max.distance > 2){ message("WARNING: MAX DISTANCE ", max.distance, " ALLOWS MANY MISMATCHES!")}
   if (testing == TRUE){ message("------- READS WILL BE SUBSETTED FOR TESTING -------")}
+  if(!file.exists(barcodes.file.path)) stop("BARCODE FILE DOES NOT EXIST")
 
   options(expressions = 2.5e5) # Increase the number of nested expressions to be evaluated. Limit is 5e5.
 
@@ -93,11 +94,12 @@ BatchMutationCalling = function(out = "/path_to_filtered_fastqs/",
         message("CHUNK ", x, " WILL NOT BE REWRITTEN. SKIPPING...")
       }
     }, error = function(e) {
-      message("ERROR IN CHUNK ", x, "!!!: ", conditionMessage(e), "\n")
+      message("ERROR IN CHUNK ", x, "!!: ", conditionMessage(e), "\n")
     })
   }, mc.cores = ncores)
 
   message("------- FINISHED MUTATION CALLING! -------")
+  return()
 }
 
 
